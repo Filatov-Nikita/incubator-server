@@ -1,4 +1,5 @@
 import { OrderModel, ProductModel, UserModel } from '#app/globals/models.js';
+import { Op } from 'sequelize';
 
 function createMap(list, pk) {
   if(!Array.isArray(list)) throw new Error();
@@ -63,6 +64,35 @@ export async function show(req, res, next) {
      });
 
     res.json(order);
+  } catch(e) {
+    next(e);
+  }
+}
+
+export async function list(req, res, next) {
+  try {
+    const where = {};
+    const { dateFrom, dateTo } = req.query;
+
+    if(dateFrom) {
+      if(!where.createdAt) where.createdAt = {};
+      where.createdAt[Op.gte] = new Date(dateFrom);
+    }
+
+    if(dateTo) {
+      if(!where.createdAt) where.createdAt = {};
+      const dt = new Date(dateTo);
+      dt.setDate(dt.getDate() + 1);
+      where.createdAt[Op.lt] = dt;
+    }
+
+    const orders = await OrderModel.findAll({
+      where,
+      order: [ ['createdAt', 'DESC'] ],
+      include: ProductModel,
+    });
+
+    res.json(orders);
   } catch(e) {
     next(e);
   }

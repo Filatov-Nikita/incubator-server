@@ -10,6 +10,7 @@ import * as Cats from '#app/controllers/categories.js';
 import * as Products from '#app/controllers/products.js';
 import * as Orders from '#app/controllers/orders.js';
 import * as Auth from '#app/controllers/auth.js';
+import * as Reports from '#app/controllers/reports.js';
 
 export default (app) => {
   app.get('/tags', Tags.list);
@@ -34,6 +35,10 @@ export default (app) => {
 
   app.post('/orders', ...CheckOrderCreate, Orders.create);
   app.get('/orders/:id', Orders.show);
+  app.get('/orders', Orders.list);
+
+  app.get('/reports/total_products', Reports.totalProducts);
+
   app.post('/registr', Auth.registr);
   app.post('/login', Auth.login);
 }
