@@ -1,5 +1,6 @@
 import { ProductModel, OrderProductModel } from '#app/globals/models.js';
-import { Op, Sequelize } from 'sequelize';
+import { sequelize } from '#app/globals/sequelize.js';
+import { Op, Sequelize, QueryTypes } from 'sequelize';
 
 export async function totalProducts(req, res, next) {
   try {
@@ -18,33 +19,19 @@ export async function totalProducts(req, res, next) {
       where.createdAt[Op.lt] = dt;
     }
 
-    const list = await OrderProductModel.findAll({
-      group: [ 'productId', 'productPrice' ],
-      attributes: [
-        [ 'productId', 'productId' ],
-        [ 'productPrice', 'productPrice' ],
-        [Sequelize.fn('sum', Sequelize.col('productCount')), 'count'],
-      ],
-      where,
-    });
+    const list = await sequelize.query(`
+      SELECT products.id, products.name, OrderProducts.productPrice,
+      SUM(productCount) as count, SUM(productCount * productPrice) as totalSum
+      from OrderProducts JOIN products on OrderProducts.productId = products.id
+      GROUP BY productId, productPrice
+    `, { type: QueryTypes.SELECT });
 
-    const products = await ProductModel.findAll({
-      where: {
-        id: list.map(i => i.productId)
-      },
-      attributes: [
-        ['id', 'id'],
-        ['name', 'name'],
-      ]
-    });
-
-    const resposne = list.map(({ dataValues }, index) => {
-      return {
-        ...dataValues,
-        product: products[index],
-        totalSum: dataValues.count * dataValues.productPrice
-      }
-    })
+    const resposne = list.map(el => ({
+      product: { id: el.id, name: el.name },
+      totalSum: el.totalSum,
+      productPrice: el.productPrice,
+      count: el.count
+    }))
 
     res.json(resposne);
   } catch(e) {
