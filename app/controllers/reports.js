@@ -19,11 +19,11 @@ export async function totalProducts(req, res, next) {
     }
 
     const list = await OrderProductModel.findAll({
-      group: [ 'productId' ],
+      group: [ 'productId', 'productPrice' ],
       attributes: [
         [ 'productId', 'productId' ],
+        [ 'productPrice', 'productPrice' ],
         [Sequelize.fn('sum', Sequelize.col('productCount')), 'count'],
-        [Sequelize.fn('sum', Sequelize.col('productPrice')), 'totalSum'],
       ],
       where,
     });
@@ -38,10 +38,11 @@ export async function totalProducts(req, res, next) {
       ]
     });
 
-    const resposne = list.map((item, index) => {
+    const resposne = list.map(({ dataValues }, index) => {
       return {
-        ...item.dataValues,
-        product: products[index]
+        ...dataValues,
+        product: products[index],
+        totalSum: dataValues.count * dataValues.productPrice
       }
     })
 
