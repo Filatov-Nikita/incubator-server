@@ -2,7 +2,6 @@ import { UserModel } from '#app/globals/models.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-const secret = 'guitar07';
 const failedAuthMsg = 'Неправильный логин или пароль';
 
 export async function registr(req, res, next) {
@@ -36,7 +35,9 @@ export async function login(req, res, next) {
 
     const payload = { id: user.id, email: user.email, name: user.name };
 
-    const token = jwt.sign(payload, secret, { expiresIn: 60 * 60 * 24 * 365 });
+    if(!process.env.JWT_SECRET) throw new Error();
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 * 365 });
 
     res.json({ token });
   } catch(e) {

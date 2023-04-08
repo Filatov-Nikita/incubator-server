@@ -20,7 +20,7 @@ export async function create(req, res, next) {
 
     const productsMap = createMap(products, 'id');
 
-    const user = await UserModel.findByPk(10);
+    const user = await UserModel.findByPk(req.user.id);
 
     if(user === null) return res.status(404).end('Пользователь не найден');
 
