@@ -4,7 +4,8 @@ export default (sequlize, models) => {
   const Product = sequlize.define('product', {
     name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true
     },
     img: {
       type: DataTypes.STRING,
