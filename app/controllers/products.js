@@ -30,6 +30,8 @@ export async function list(req, res, next) {
       ...opts
     });
 
+    products.sort((a, b) => b.visible - a.visible);
+
     res.json({
       data: products,
       meta: {
