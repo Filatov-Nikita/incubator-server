@@ -26,7 +26,7 @@ export async function list(req, res, next) {
 
     const { count, rows: products } = await ProductModel.findAndCountAll({
       where,
-      order: [ ['createdAt', 'DESC'] ],
+      order: [ ['visible', 'DESC'], ['createdAt', 'DESC'] ],
       ...opts
     });
 
