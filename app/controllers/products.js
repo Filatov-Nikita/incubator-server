@@ -7,11 +7,12 @@ export async function list(req, res, next) {
   try {
     const and = Op.and;
     const tags = req.query.tags;
-    const opts = {}
+    const opts = {};
     const where = { [and]: [] };
 
-    const { categoryId } = req.query;
-
+    const { categoryId, offset, limit } = req.query;
+    if(limit) opts.limit = +limit;
+    if(offset) opts.offset = +offset;
     if(categoryId) where[and].push({ categoryId });
     if('visible' in req.query) where[and].push({ visible: true });
 
@@ -23,13 +24,20 @@ export async function list(req, res, next) {
       }
     ];
 
-    const products = await ProductModel.findAll({
+    const { count, rows: products } = await ProductModel.findAndCountAll({
       where,
       order: [ ['createdAt', 'DESC'] ],
       ...opts
     });
 
-    res.json(products);
+    res.json({
+      data: products,
+      meta: {
+        limit: opts.limit,
+        offset: opts.offset,
+        total: count,
+      }
+    });
   } catch(e) {
     next(e);
   }
