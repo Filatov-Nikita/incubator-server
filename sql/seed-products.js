@@ -1,11 +1,18 @@
-import { ProductModel } from '#app/globals/models.js';
+import { ProductModel, CategoryModel } from '#app/globals/models.js';
 
-const array = Array(1000).fill(
+const cat = await CategoryModel.findOrCreate({
+  where: { name: 'Птица' }
+})
+
+const array = Array(100).fill(
   {
-    name: 'Бройлер',
     price: 100,
-    categoryId: 2,
+    categoryId: cat.id,
     visible: true
-  }, 0, 1000
-)
+  }, 0, 100
+).map((e, i) => ({
+  ...e,
+  name: 'Бройлер ' + (i + 1)
+}));
+
 await ProductModel.bulkCreate(array);
