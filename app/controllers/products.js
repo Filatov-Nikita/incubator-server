@@ -67,6 +67,10 @@ export async function create(req, res, next) {
       visible
     });
 
+    product.price = +product.price;
+    product.visible = !!product.visible;
+    product.categoryId = categoryId ? +categoryId : null;
+
     res.json(product);
   } catch(e) {
     next(e)
