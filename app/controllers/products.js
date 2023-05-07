@@ -56,7 +56,7 @@ export async function show(req, res, next) {
 
 export async function create(req, res, next) {
   try {
-    const img = req.file ? publicUrl(req.file) : null;
+    const img = req.file ? publicUrl(req.file) : req.body.img ?? null;
     const { name, price, description = null, categoryId = null, visible = true } = req.body;
     const product = await ProductModel.create({
       img,
@@ -80,7 +80,7 @@ export async function create(req, res, next) {
 export async function update(req, res, next) {
   try {
     const id = req.params.id;
-    const img = req.file ? publicUrl(req.file) : undefined;
+    const img = req.file ? publicUrl(req.file) : req.body.img;
     const { name, price, description, categoryId, visible } = req.body;
     await ProductModel.update(
       {
