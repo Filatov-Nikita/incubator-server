@@ -67,11 +67,9 @@ export async function create(req, res, next) {
       visible
     });
 
-    product.price = +product.price;
-    product.visible = !!product.visible;
-    product.categoryId = categoryId ? +categoryId : null;
-
-    res.json(product);
+    res.json(await ProductModel.findByPk(product.id, {
+      include: TagModel
+    }));
   } catch(e) {
     next(e)
   }
