@@ -78,7 +78,12 @@ export async function create(req, res, next) {
 export async function update(req, res, next) {
   try {
     const id = req.params.id;
-    const img = req.file ? publicUrl(req.file) : req.body.img || null;
+
+    let img;
+    if(req.file !== undefined || req.body.img !== undefined) {
+      img = req.file ? publicUrl(req.file) : req.body.img || null;
+    }
+
     const { name, price, description, categoryId, visible } = req.body;
     await ProductModel.update(
       {
