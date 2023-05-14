@@ -92,7 +92,34 @@ export async function list(req, res, next) {
       include: ProductModel,
     });
 
-    res.json(orders);
+    const list = orders.map(order => {
+      let orderTotal = 0;
+
+      const products = order.products.map(product => {
+        const { productCount: count, productPrice: price } = product.OrderProduct;
+        const total = count * price;
+        orderTotal += total;
+        return {
+          total,
+          id: product.id,
+          count,
+          price,
+          name: product.name
+        }
+      });
+
+      return {
+        products,
+        total: orderTotal,
+        createdAt: order.createdAt,
+        id: order.id,
+        userId: order.userId,
+      }
+    });
+
+    res.json({
+      orders: list,
+    });
   } catch(e) {
     next(e);
   }
