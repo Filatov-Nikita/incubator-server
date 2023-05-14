@@ -45,10 +45,12 @@ export async function totalProducts(req, res, next) {
     });
 
     let total = 0;
+    let totalCount = 0;
     list.forEach(item => {
       const { price, count } = item;
       item.total = price * count
-      total += item.total
+      total += item.total;
+      totalCount += count;
     });
 
     const resposne = list.map(el => ({
@@ -60,7 +62,8 @@ export async function totalProducts(req, res, next) {
 
     res.json({
       products: resposne,
-      total
+      total,
+      totalCount
     });
   } catch(e) {
     next(e);
