@@ -6,14 +6,16 @@ import NotFound from '#app/errors/NotFound.js';
 export async function list(req, res, next) {
   try {
     const and = Op.and;
+    const like = Op.like;
     const tags = req.query.tags;
     const opts = {};
     const where = { [and]: [] };
 
-    const { categoryId, offset, limit } = req.query;
+    const { categoryId, offset, limit, search } = req.query;
     if(limit) opts.limit = +limit;
     if(offset) opts.offset = +offset;
     if(categoryId) where[and].push({ categoryId });
+    if(search) where[and].push({ name: { [like]: `%${search}%` } });
     if('visible' in req.query) where[and].push({ visible: true });
 
     if('withTags' in req.query) opts.include = TagModel;
